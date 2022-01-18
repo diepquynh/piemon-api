@@ -1,5 +1,8 @@
-package com.lillya.piemon.gacha;
+package com.lillya.piemon.gacha.service;
 
+import com.lillya.piemon.gacha.data.GachaItemRepository;
+import com.lillya.piemon.gacha.model.GachaItem;
+import com.lillya.piemon.gacha.model.GachaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;

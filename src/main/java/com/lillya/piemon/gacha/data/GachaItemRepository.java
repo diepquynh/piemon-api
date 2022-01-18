@@ -1,5 +1,6 @@
-package com.lillya.piemon.gacha;
+package com.lillya.piemon.gacha.data;
 
+import com.lillya.piemon.gacha.model.GachaItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

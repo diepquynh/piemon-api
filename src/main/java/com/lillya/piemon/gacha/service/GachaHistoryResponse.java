@@ -1,5 +1,6 @@
-package com.lillya.piemon.gacha;
+package com.lillya.piemon.gacha.service;
 
+import com.lillya.piemon.gacha.model.GachaItem;
 import lombok.Data;
 
 import java.util.ArrayList;

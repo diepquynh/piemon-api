@@ -1,4 +1,4 @@
-package com.lillya.piemon.config;
+package com.lillya.piemon.config.rest;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

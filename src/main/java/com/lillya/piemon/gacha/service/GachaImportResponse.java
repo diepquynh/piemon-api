@@ -1,4 +1,4 @@
-package com.lillya.piemon.gacha;
+package com.lillya.piemon.gacha.service;
 
 import lombok.Data;
 

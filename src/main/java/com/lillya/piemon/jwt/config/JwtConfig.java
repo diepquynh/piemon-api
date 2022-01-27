@@ -13,6 +13,7 @@ public class JwtConfig {
     private String secretKey;
     private String tokenPrefix;
     private Integer tokenExpirationAfterDays;
+    private String filterUrl;
 
     public String getAuthorizationHeader() {
         return HttpHeaders.AUTHORIZATION;

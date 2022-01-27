@@ -9,7 +9,7 @@ import java.util.Set;
 
 @Entity
 @Data
-@Table(name = "privilege")
+@Table(name = "privileges")
 public class Privilege {
 
     @Id

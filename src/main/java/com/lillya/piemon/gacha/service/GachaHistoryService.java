@@ -5,6 +5,7 @@ import com.lillya.piemon.gacha.model.GachaItem;
 import com.lillya.piemon.gacha.model.GachaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -56,6 +57,7 @@ public class GachaHistoryService {
      *      "retcode": -100
      * }
      */
+    @Async
     public GachaImportResponse importHistory(String url)
             throws MalformedURLException, SocketTimeoutException, InterruptedException, AuthException {
         UriComponentsBuilder builder =

@@ -45,6 +45,6 @@ public class GachaHistoryController {
             throws MalformedURLException, SocketTimeoutException, InterruptedException, AuthException {
         GachaImportResponse ret = gachaHistoryService.importHistory(url);
 
-        return ResponseEntity.ok().body(ret);
+        return ResponseEntity.ok().body("");
     }
 }

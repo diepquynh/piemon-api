@@ -1,7 +1,6 @@
 package com.lillya.piemon.gacha.controller;
 
 import com.lillya.piemon.gacha.service.GachaHistoryService;
-import com.lillya.piemon.gacha.service.GachaImportResponse;
 import com.lillya.piemon.gacha.model.GachaItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -43,8 +42,14 @@ public class GachaHistoryController {
     @ResponseBody
     public ResponseEntity importGachaHistory(@RequestBody String url)
             throws MalformedURLException, SocketTimeoutException, InterruptedException, AuthException {
-        GachaImportResponse ret = gachaHistoryService.importHistory(url);
+        gachaHistoryService.importHistory(url);
 
         return ResponseEntity.ok().body("");
+    }
+
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @RequestMapping(value = "/checkImport/{uid}", method = RequestMethod.GET)
+    public Integer getImportState(@PathVariable("uid") Integer uid) {
+        return gachaHistoryService.getImportingState(uid);
     }
 }

@@ -13,6 +13,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.security.auth.message.AuthException;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -23,6 +24,8 @@ public class GachaHistoryService {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    private HashMap<Integer, Integer> importingMap = new HashMap<>();
 
     @Bean
     private List<GachaType> getTypes() {
@@ -48,6 +51,10 @@ public class GachaHistoryService {
         return gachaItemRepository.findAllByUidAndGachaType(uid, gacha_type);
     }
 
+    public Integer getImportingState(Integer uid) {
+        return importingMap.get(uid);
+    }
+
     /*
      * Types of errors:
      * - Authkey error:
@@ -58,7 +65,7 @@ public class GachaHistoryService {
      * }
      */
     @Async
-    public GachaImportResponse importHistory(String url)
+    public void importHistory(String url)
             throws MalformedURLException, SocketTimeoutException, InterruptedException, AuthException {
         UriComponentsBuilder builder =
                         UriComponentsBuilder.newInstance()
@@ -66,10 +73,11 @@ public class GachaHistoryService {
                         .host("hk4e-api-os.mihoyo.com")
                         .path("event/gacha_info/api/getGachaLog");
 
-        String msg = "";
-        int retcode = 0;
+
         int page = 1;
         long end_id = 0;
+        Integer uid = -1;
+        boolean uidChecked = false;
         URL this_url = new URL(url);
         String query = this_url.getQuery();
         String[] pairs = query.split("&");
@@ -93,10 +101,17 @@ public class GachaHistoryService {
             if (response == null)
                 throw new SocketTimeoutException("Request timeout!");
 
-            retcode = response.getRetcode();
-            msg = response.getMessage();
-
             while (response.getData() != null && response.getData().getList().size() > 0) {
+                if (!uidChecked) {
+                    uid = response.getData().getList().get(0).getUid();
+                    Integer mVal = importingMap.get(uid);
+                    importingMap.put(uid, mVal != null ? ++mVal : 1);
+                    if (mVal != null)
+                        return;
+
+                    uidChecked = true;
+                }
+
                 response.getData().getList().forEach(item -> gachaItemRepository.save(item));
 
                 page++;
@@ -110,6 +125,6 @@ public class GachaHistoryService {
             Thread.sleep(2000);
         }
 
-        return new GachaImportResponse(retcode, msg);
+        importingMap.remove(uid);
     }
 }

@@ -46,4 +46,8 @@ public class User implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
     )
     private Set<Role> roles;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "provider", length = 15)
+    private Provider provider;
 }

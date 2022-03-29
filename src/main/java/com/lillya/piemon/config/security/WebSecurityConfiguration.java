@@ -24,14 +24,16 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
+    private final OAuth2UserServiceImpl oauth2UserService;
     private final UserDetailsServiceImpl userDetailsService;
     private final PasswordEncoder passwordEncoder;
     private final JwtConfig jwtConfig;
     private final JwtUtils jwtUtils;
 
     @Autowired
-    public WebSecurityConfiguration(UserDetailsServiceImpl userDetailsService,
+    public WebSecurityConfiguration(OAuth2UserServiceImpl oauth2UserService, UserDetailsServiceImpl userDetailsService,
                                     PasswordEncoder passwordEncoder, JwtConfig jwtConfig, JwtUtils jwtUtils) {
+        this.oauth2UserService = oauth2UserService;
         this.userDetailsService = userDetailsService;
         this.passwordEncoder = passwordEncoder;
         this.jwtConfig = jwtConfig;
@@ -48,8 +50,21 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtConfig, jwtUtils))
                 .addFilterAfter(new JwtTokenFilter(jwtConfig, jwtUtils), JwtAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers("/api/*/users/register").permitAll()
-                .anyRequest().authenticated();
+                .antMatchers("/api/*/users/register",
+                        "/oauth2/**",
+                        "/api/*/users/login/oauth").permitAll()
+                .anyRequest().authenticated()
+                .and()
+                .oauth2Login()
+                    .loginPage("/oauth2/authorization/google")
+                    .userInfoEndpoint()
+                        .userService(oauth2UserService)
+                .and()
+                .successHandler((request, response, authentication) -> {
+                    OAuth2UserImpl oauthUser = (OAuth2UserImpl) authentication.getPrincipal();
+
+                    oauth2UserService.postLogin(oauthUser.getEmail());
+                });
     }
 
     @Override

@@ -1,8 +1,11 @@
 package com.lillya.piemon.config.security;
 
+import com.lillya.piemon.auth.user.model.OAuth2UserImpl;
+import com.lillya.piemon.auth.user.service.OAuth2UserServiceImpl;
 import com.lillya.piemon.auth.user.service.UserDetailsServiceImpl;
 import com.lillya.piemon.jwt.JwtAuthenticationFilter;
 import com.lillya.piemon.jwt.JwtTokenFilter;
+import com.lillya.piemon.jwt.JwtUtils;
 import com.lillya.piemon.jwt.config.JwtConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -16,8 +19,6 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import javax.crypto.SecretKey;
-
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -25,15 +26,16 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsServiceImpl userDetailsService;
     private final PasswordEncoder passwordEncoder;
-    private final SecretKey secretKey;
     private final JwtConfig jwtConfig;
+    private final JwtUtils jwtUtils;
 
     @Autowired
-    public WebSecurityConfiguration(UserDetailsServiceImpl userDetailsService, SecretKey secretKey, JwtConfig jwtConfig, PasswordEncoder passwordEncoder) {
+    public WebSecurityConfiguration(UserDetailsServiceImpl userDetailsService,
+                                    PasswordEncoder passwordEncoder, JwtConfig jwtConfig, JwtUtils jwtUtils) {
         this.userDetailsService = userDetailsService;
-        this.secretKey = secretKey;
-        this.jwtConfig = jwtConfig;
         this.passwordEncoder = passwordEncoder;
+        this.jwtConfig = jwtConfig;
+        this.jwtUtils = jwtUtils;
     }
 
     @Override
@@ -43,8 +45,8 @@ public class WebSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtConfig, secretKey))
-                .addFilterAfter(new JwtTokenFilter(secretKey, jwtConfig), JwtAuthenticationFilter.class)
+                .addFilter(new JwtAuthenticationFilter(authenticationManager(), jwtConfig, jwtUtils))
+                .addFilterAfter(new JwtTokenFilter(jwtConfig, jwtUtils), JwtAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers("/api/*/users/register").permitAll()
                 .anyRequest().authenticated();

@@ -5,14 +5,12 @@ import com.lillya.piemon.jwt.config.JwtConfig;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.crypto.SecretKey;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -25,13 +23,12 @@ import java.util.stream.Collectors;
 
 public class JwtTokenFilter extends OncePerRequestFilter {
 
-    private final SecretKey secretKey;
     private final JwtConfig jwtConfig;
+    private final JwtUtils jwtUtils;
 
-    public JwtTokenFilter(SecretKey secretKey,
-                          JwtConfig jwtConfig) {
-        this.secretKey = secretKey;
+    public JwtTokenFilter(JwtConfig jwtConfig, JwtUtils jwtUtils) {
         this.jwtConfig = jwtConfig;
+        this.jwtUtils = jwtUtils;
     }
 
     @Override
@@ -51,9 +48,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
         try {
 
-            Jws<Claims> claimsJws = Jwts.parser()
-                    .setSigningKey(secretKey)
-                    .parseClaimsJws(token);
+            Jws<Claims> claimsJws = jwtUtils.parseToken(token);
 
             Claims body = claimsJws.getBody();
 

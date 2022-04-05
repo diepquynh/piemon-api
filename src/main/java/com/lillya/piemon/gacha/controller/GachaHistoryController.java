@@ -50,6 +50,7 @@ public class GachaHistoryController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @RequestMapping(value = "/checkImport/{uid}", method = RequestMethod.GET)
     public Integer getImportState(@PathVariable("uid") Integer uid) {
-        return gachaHistoryService.getImportingState(uid);
+        Integer state = gachaHistoryService.getImportingState(uid);
+        return state != null ? state : -1;
     }
 }

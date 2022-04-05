@@ -58,4 +58,25 @@ public class UserController {
                 .header("Authorization", "Bearer " + newToken)
                 .body(null);
     }
+
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @RequestMapping(value = "/update", method = RequestMethod.PUT)
+    public ResponseEntity updateUser(@RequestBody User newUser) {
+        String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User loggedUser = userDAO.findByUsername(username);
+        if (loggedUser.getId() != newUser.getId())
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Request forbidden");
+
+        String newToken;
+        try {
+            newToken = userDetailsService.updateUser(newUser);
+        } catch (UserAlreadyExistException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.NO_CONTENT)
+                .header("Authorization", "Bearer " + newToken)
+                .body("OK");
+    }
 }

@@ -17,7 +17,6 @@ import java.util.Set;
 public class User implements Serializable {
     @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private int id;
 
     @Column(name = "uid", unique = true, nullable = false)

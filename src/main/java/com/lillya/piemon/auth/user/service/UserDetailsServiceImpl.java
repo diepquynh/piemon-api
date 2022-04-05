@@ -39,7 +39,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return new UserDetailsImpl(user);
     }
 
-    public User registerUser(User user) {
+    public void registerUser(User user) {
         boolean usernameExist = userDAO.findByUsername(user.getUsername()) != null;
         if (usernameExist)
             throw new UserAlreadyExistException("Username exist!");
@@ -53,7 +53,5 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         user.setEnabled(true);
 
         userDAO.save(user);
-
-        return user;
     }
 }

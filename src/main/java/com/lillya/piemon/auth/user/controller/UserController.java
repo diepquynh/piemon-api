@@ -6,6 +6,7 @@ import com.lillya.piemon.auth.user.model.User;
 import com.lillya.piemon.auth.user.service.OAuth2UserServiceImpl;
 import com.lillya.piemon.auth.user.service.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -39,14 +40,13 @@ public class UserController {
 
     @RequestMapping(value = "/register", method = RequestMethod.POST)
     public ResponseEntity registerUser(@RequestBody User user) {
-        User ret = null;
         try {
-            ret = userDetailsService.registerUser(user);
+            userDetailsService.registerUser(user);
         } catch (UserAlreadyExistException e) {
-            return ResponseEntity.ok().body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
         }
 
-        return ResponseEntity.ok().body(ret);
+        return ResponseEntity.status(HttpStatus.CREATED).body("OK");
     }
 
     @RequestMapping(value = "/login/oauth", method = RequestMethod.POST)
